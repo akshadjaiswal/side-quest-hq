@@ -44,11 +44,14 @@ export function Header({ user, onAddProject }: HeaderProps) {
   const handleViewProfile = async () => {
     if (!user?.username) return
     try {
-      await queryClient.prefetchQuery({
-        queryKey: ['public-profile', user.username],
-        queryFn: () => fetchPublicProfile(user.username),
-        staleTime: 3 * 60 * 1000,
-      })
+      const username = user.username
+      if (username) {
+        await queryClient.prefetchQuery({
+          queryKey: ['public-profile', username],
+          queryFn: () => fetchPublicProfile(username),
+          staleTime: 3 * 60 * 1000,
+        })
+      }
     } catch (error) {
       // Ignore prefetch errors; navigation will fetch if needed
     }
