@@ -1,25 +1,21 @@
-import { NextResponse } from 'next/server'
+/**
+ * GitHub OAuth Initiation Route
+ *
+ * Redirects user to GitHub OAuth authorization page.
+ */
 
-export async function GET() {
-  const githubClientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID
-  const redirectUri = process.env.GITHUB_REDIRECT_URI || `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
+import { NextRequest, NextResponse } from 'next/server'
+import { getGitHubAuthUrl } from '@/lib/github/oauth'
 
-  if (!githubClientId) {
+export async function GET(request: NextRequest) {
+  try {
+    const authUrl = getGitHubAuthUrl()
+    return NextResponse.redirect(authUrl)
+  } catch (error) {
+    console.error('[GitHub OAuth] Failed to initiate:', error)
     return NextResponse.json(
-      { error: 'GitHub OAuth not configured' },
+      { error: 'Failed to initiate GitHub authentication' },
       { status: 500 }
     )
   }
-
-  // GitHub OAuth authorization URL
-  const params = new URLSearchParams({
-    client_id: githubClientId,
-    redirect_uri: redirectUri,
-    scope: 'read:user user:email repo',
-    state: Math.random().toString(36).substring(7), // Simple CSRF protection
-  })
-
-  const authUrl = `https://github.com/login/oauth/authorize?${params.toString()}`
-
-  return NextResponse.redirect(authUrl)
 }

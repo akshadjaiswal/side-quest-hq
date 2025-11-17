@@ -37,13 +37,13 @@ module.exports = {
           shipped: '#2563EB',
           'shipped-light': '#DBEAFE',
         },
-        // Graveyard theme
+        // Graveyard theme (softer, more elegant dark theme)
         graveyard: {
-          background: '#2E1065',
-          'background-light': '#4C1D95',
-          text: '#E9D5FF',
-          accent: '#A78BFA',
-          sepia: '#92400E',
+          background: '#1E1B2E',      // Softer dark purple-gray
+          'background-light': '#2D2640', // Muted purple
+          text: '#E5DEFF',            // Warmer lavender
+          accent: '#9D8DF1',          // Softer purple accent
+          sepia: '#6B4423',           // Warmer sepia tone
         },
         border: {
           DEFAULT: '#E7E5E4',

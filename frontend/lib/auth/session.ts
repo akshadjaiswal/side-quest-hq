@@ -1,62 +1,115 @@
+/**
+ * Session Management Utilities
+ *
+ * Cookie-based session management for authentication using JWT.
+ */
+
 import { cookies } from 'next/headers'
+import { SignJWT, jwtVerify } from 'jose'
 
-export interface GitHubUser {
-  id: number
-  login: string
-  avatar_url: string
-  email: string
+const SESSION_COOKIE_NAME = 'sidequesthq_session'
+const SESSION_SECRET = new TextEncoder().encode(
+  process.env.SESSION_SECRET || 'changelogcraft-super-secret-key-change-in-production-12345'
+)
+const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000 // 30 days
+
+export interface SessionData {
+  userId: string
+  githubId: number
+  username: string
+  avatarUrl: string
+  email: string | null
+  expiresAt: number
 }
 
 /**
- * Get the current authenticated user from session cookies
- * Use this in Server Components and API routes
+ * Create a new session token
  */
-export async function getCurrentUser(): Promise<GitHubUser | null> {
-  const cookieStore = await cookies()
-  const userCookie = cookieStore.get('github_user')
+export async function createSession(
+  data: Omit<SessionData, 'expiresAt'>
+): Promise<string> {
+  const expiresAt = Date.now() + SESSION_DURATION
 
-  if (!userCookie?.value) {
-    return null
-  }
+  const token = await new SignJWT({
+    ...data,
+    expiresAt,
+  })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('30d')
+    .sign(SESSION_SECRET)
 
+  return token
+}
+
+/**
+ * Verify and decode a session token
+ */
+export async function verifySession(token: string): Promise<SessionData | null> {
   try {
-    return JSON.parse(userCookie.value) as GitHubUser
-  } catch {
+    const { payload } = await jwtVerify(token, SESSION_SECRET)
+
+    const sessionData = payload as unknown as SessionData
+
+    // Check if session is expired
+    if (sessionData.expiresAt < Date.now()) {
+      return null
+    }
+
+    return sessionData
+  } catch (error) {
+    console.error('[Session] Verification failed:', error)
     return null
   }
 }
 
 /**
- * Get the GitHub access token from session cookies
- * Use this in Server Components and API routes when you need to make GitHub API calls
+ * Set session cookie
  */
-export async function getGitHubToken(): Promise<string | null> {
+export async function setSessionCookie(token: string): Promise<void> {
   const cookieStore = await cookies()
-  const tokenCookie = cookieStore.get('github_token')
 
-  return tokenCookie?.value || null
+  cookieStore.set(SESSION_COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: SESSION_DURATION / 1000, // Convert to seconds
+    path: '/',
+  })
 }
 
 /**
- * Client-side hook to get user from cookies
- * Note: This requires 'use client' directive
+ * Get session from cookie
  */
-export function getUserFromCookies(): GitHubUser | null {
-  if (typeof window === 'undefined') {
+export async function getSession(): Promise<SessionData | null> {
+  const cookieStore = await cookies()
+  const token = cookieStore.get(SESSION_COOKIE_NAME)
+
+  if (!token) {
     return null
   }
 
-  const cookies = document.cookie.split(';')
-  const userCookie = cookies.find(c => c.trim().startsWith('github_user='))
+  return verifySession(token.value)
+}
 
-  if (!userCookie) {
-    return null
-  }
+/**
+ * Clear session cookie
+ */
+export async function clearSession(): Promise<void> {
+  const cookieStore = await cookies()
+  cookieStore.delete(SESSION_COOKIE_NAME)
+}
 
-  try {
-    const value = userCookie.split('=')[1]
-    return JSON.parse(decodeURIComponent(value)) as GitHubUser
-  } catch {
-    return null
-  }
+/**
+ * Refresh session (extend expiration)
+ */
+export async function refreshSession(sessionData: SessionData): Promise<void> {
+  const newToken = await createSession({
+    userId: sessionData.userId,
+    githubId: sessionData.githubId,
+    username: sessionData.username,
+    avatarUrl: sessionData.avatarUrl,
+    email: sessionData.email,
+  })
+
+  await setSessionCookie(newToken)
 }

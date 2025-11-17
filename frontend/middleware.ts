@@ -1,30 +1,62 @@
-import { NextResponse, type NextRequest } from 'next/server'
+/**
+ * Next.js Middleware
+ *
+ * Handles authentication and route protection using JWT sessions.
+ */
+
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { verifySession } from '@/lib/auth/session'
 
 export async function middleware(request: NextRequest) {
-  const response = NextResponse.next()
+  const { pathname } = request.nextUrl
 
-  // Check for GitHub session cookie
-  const githubUser = request.cookies.get('github_user')
-  const isAuthenticated = !!githubUser
+  // Public routes that don't require authentication
+  const publicRoutes = ['/', '/login', '/api/auth/github', '/api/auth/callback']
+  const isPublicRoute = publicRoutes.includes(pathname) || pathname.startsWith('/@')
 
-  // Protected routes - require authentication
-  if (request.nextUrl.pathname.startsWith('/dashboard') ||
-      request.nextUrl.pathname.startsWith('/graveyard') ||
-      request.nextUrl.pathname.startsWith('/settings') ||
-      request.nextUrl.pathname.startsWith('/projects')) {
-    if (!isAuthenticated) {
+  // Allow public routes
+  if (isPublicRoute) {
+    return NextResponse.next()
+  }
+
+  try {
+    // Check authentication for protected routes
+    const sessionCookie = request.cookies.get('sidequesthq_session')
+
+    if (!sessionCookie) {
+      // No session cookie, redirect to login
+      if (pathname.startsWith('/dashboard') ||
+          pathname.startsWith('/graveyard') ||
+          pathname.startsWith('/settings') ||
+          pathname.startsWith('/projects')) {
+        return NextResponse.redirect(new URL('/login', request.url))
+      }
+      return NextResponse.next()
+    }
+
+    // Verify session
+    const session = await verifySession(sessionCookie.value)
+
+    // If no valid session and trying to access protected route, redirect to login
+    if (!session && (pathname.startsWith('/dashboard') ||
+                     pathname.startsWith('/graveyard') ||
+                     pathname.startsWith('/settings') ||
+                     pathname.startsWith('/projects'))) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
-  }
 
-  // Auth routes - redirect to dashboard if already logged in
-  if (request.nextUrl.pathname === '/login') {
-    if (isAuthenticated) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
+    return NextResponse.next()
+  } catch (error) {
+    console.error('[Middleware] Error:', error)
+    if (pathname.startsWith('/dashboard') ||
+        pathname.startsWith('/graveyard') ||
+        pathname.startsWith('/settings') ||
+        pathname.startsWith('/projects')) {
+      return NextResponse.redirect(new URL('/login', request.url))
     }
+    return NextResponse.next()
   }
-
-  return response
 }
 
 export const config = {

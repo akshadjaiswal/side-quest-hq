@@ -101,19 +101,3 @@ export class GitHubClient {
     return techStack
   }
 }
-
-export async function getGitHubAccessToken(userId: string): Promise<string | null> {
-  // This will get the access token from Supabase session
-  // Supabase stores provider tokens when using OAuth
-  try {
-    const { createClient } = await import('@/lib/supabase/client')
-    const supabase = createClient()
-
-    const { data: { session } } = await supabase.auth.getSession()
-
-    return session?.provider_token || null
-  } catch (error) {
-    console.error('Error getting GitHub token:', error)
-    return null
-  }
-}

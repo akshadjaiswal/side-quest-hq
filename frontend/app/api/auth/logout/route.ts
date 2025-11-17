@@ -1,23 +1,36 @@
-import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+/**
+ * Logout Route
+ *
+ * Logs out the current user and clears session.
+ */
 
-export async function POST() {
-  const cookieStore = await cookies()
+import { NextRequest, NextResponse } from 'next/server'
+import { clearSession } from '@/lib/auth/session'
 
-  // Clear session cookies
-  cookieStore.delete('github_token')
-  cookieStore.delete('github_user')
+export async function POST(request: NextRequest) {
+  try {
+    // Clear session cookie
+    await clearSession()
 
-  return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, message: 'Logged out successfully' })
+  } catch (error) {
+    console.error('[Logout] Error:', error)
+    return NextResponse.json(
+      { error: 'Failed to logout' },
+      { status: 500 }
+    )
+  }
 }
 
-export async function GET() {
-  const cookieStore = await cookies()
+export async function GET(request: NextRequest) {
+  try {
+    // Clear session cookie
+    await clearSession()
 
-  // Clear session cookies
-  cookieStore.delete('github_token')
-  cookieStore.delete('github_user')
-
-  // Redirect to login page
-  return NextResponse.redirect(new URL('/login', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'))
+    // Redirect to login page
+    return NextResponse.redirect(new URL('/login', request.url))
+  } catch (error) {
+    console.error('[Logout] Error:', error)
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
 }

@@ -2,20 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { GitHubClient } from '@/lib/github/client'
 import { generateSlug } from '@/lib/utils/slug'
+import { getSession } from '@/lib/auth/session'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    const session = await getSession()
 
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!session || !user) {
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -26,7 +19,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No repositories selected' }, { status: 400 })
     }
 
-    const accessToken = session.provider_token
+    // Fetch GitHub token from user_profiles table
+    const supabase = await createClient()
+    const { data: profile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('github_access_token')
+      .eq('id', session.userId)
+      .single()
+
+    if (profileError || !profile) {
+      return NextResponse.json({ error: 'User profile not found' }, { status: 404 })
+    }
+
+    const accessToken = profile.github_access_token
     if (!accessToken) {
       return NextResponse.json({ error: 'GitHub token not found' }, { status: 400 })
     }
@@ -72,7 +77,7 @@ export async function POST(request: NextRequest) {
       const { data, error } = await supabase
         .from('side_projects')
         .insert({
-          user_id: user.id,
+          user_id: session.userId,
           name: repo.name,
           slug,
           description: repo.description || `Imported from GitHub: ${repo.name}`,

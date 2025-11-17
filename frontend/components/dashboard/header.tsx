@@ -10,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { createClient } from '@/lib/supabase/client'
 import { UserProfile } from '@/types'
 import { LogOut, Settings, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -23,13 +22,16 @@ interface HeaderProps {
 
 export function Header({ user, onAddProject }: HeaderProps) {
   const router = useRouter()
-  const supabase = createClient()
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    toast.success('Signed out successfully')
-    router.push('/login')
-    router.refresh()
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      toast.success('Signed out successfully')
+      router.push('/login')
+      router.refresh()
+    } catch (error) {
+      toast.error('Failed to sign out')
+    }
   }
 
   const userInitials = user?.username

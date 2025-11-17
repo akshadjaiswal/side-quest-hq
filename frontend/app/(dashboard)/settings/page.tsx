@@ -10,12 +10,14 @@ import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import { ExternalLink, Copy, Check } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
+import { getUserId } from '@/lib/auth/client-session'
 
 export default function SettingsPage() {
   const supabase = createClient()
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
 
   const [profile, setProfile] = useState({
     username: '',
@@ -31,15 +33,17 @@ export default function SettingsPage() {
 
   const loadProfile = async () => {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) return
+      const id = await getUserId()
+      if (!id) {
+        toast.error('Not authenticated')
+        return
+      }
+      setUserId(id)
 
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', id)
         .single()
 
       if (error) throw error
@@ -64,10 +68,10 @@ export default function SettingsPage() {
   const handleSave = async () => {
     setIsSaving(true)
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) return
+      if (!userId) {
+        toast.error('Not authenticated')
+        return
+      }
 
       const { error } = await supabase
         .from('user_profiles')
@@ -77,7 +81,7 @@ export default function SettingsPage() {
           twitter_handle: profile.twitter_handle || null,
           is_profile_public: profile.is_profile_public,
         })
-        .eq('id', user.id)
+        .eq('id', userId)
 
       if (error) throw error
 
