@@ -4,11 +4,14 @@ import { createClient } from '@/lib/supabase/server'
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const username = searchParams.get('username')
+    let username = searchParams.get('username')
 
     if (!username) {
       return NextResponse.json({ error: 'Username required' }, { status: 400 })
     }
+
+    // Remove @ symbol if present
+    username = username.replace('@', '')
 
     const supabase = await createClient()
 

@@ -1,7 +1,6 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { createClient } from '@/lib/supabase/client'
 import {
   getProjects,
   getProjectById,
@@ -12,18 +11,15 @@ import {
 } from '@/lib/supabase/queries/projects'
 import { ProjectFormData } from '@/types'
 import { toast } from 'sonner'
+import { getUserId } from '@/lib/auth/client-session'
 
 export function useProjects() {
-  const supabase = createClient()
-
   return useQuery({
     queryKey: ['projects'],
     queryFn: async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) throw new Error('Not authenticated')
-      return getProjects(user.id)
+      const userId = await getUserId()
+      if (!userId) throw new Error('Not authenticated')
+      return getProjects(userId)
     },
   })
 }
@@ -37,31 +33,24 @@ export function useProject(id: string) {
 }
 
 export function useProjectsByStatus(status: string) {
-  const supabase = createClient()
-
   return useQuery({
     queryKey: ['projects', status],
     queryFn: async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) throw new Error('Not authenticated')
-      return getProjectsByStatus(user.id, status)
+      const userId = await getUserId()
+      if (!userId) throw new Error('Not authenticated')
+      return getProjectsByStatus(userId, status)
     },
   })
 }
 
 export function useCreateProject() {
   const queryClient = useQueryClient()
-  const supabase = createClient()
 
   return useMutation({
     mutationFn: async (projectData: ProjectFormData) => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) throw new Error('Not authenticated')
-      return createProject(user.id, projectData)
+      const userId = await getUserId()
+      if (!userId) throw new Error('Not authenticated')
+      return createProject(userId, projectData)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] })

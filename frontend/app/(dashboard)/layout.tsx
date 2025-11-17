@@ -2,27 +2,25 @@ import { Sidebar } from '@/components/dashboard/sidebar'
 import { Header } from '@/components/dashboard/header'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { getSession } from '@/lib/auth/session'
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
+  const session = await getSession()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
+  if (!session) {
     redirect('/login')
   }
 
-  // Fetch user profile
+  // Fetch user profile using session userId
+  const supabase = await createClient()
   const { data: profile } = await supabase
     .from('user_profiles')
     .select('*')
-    .eq('id', user.id)
+    .eq('id', session.userId)
     .single()
 
   return (

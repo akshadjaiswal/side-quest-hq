@@ -1,20 +1,32 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { GitHubClient } from '@/lib/github/client'
+import { getSession } from '@/lib/auth/session'
 
 export async function GET() {
   try {
-    const supabase = await createClient()
-
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
+    const session = await getSession()
 
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const accessToken = session.provider_token
+    // Fetch GitHub token from user_profiles table
+    const supabase = await createClient()
+    const { data: profile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('github_access_token')
+      .eq('id', session.userId)
+      .single()
+
+    if (profileError || !profile) {
+      return NextResponse.json(
+        { error: 'User profile not found' },
+        { status: 404 }
+      )
+    }
+
+    const accessToken = profile.github_access_token
     if (!accessToken) {
       return NextResponse.json(
         { error: 'GitHub token not found. Please reconnect your GitHub account.' },
