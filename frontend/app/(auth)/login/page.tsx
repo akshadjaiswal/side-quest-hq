@@ -1,32 +1,16 @@
 'use client'
 
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { GithubIcon } from 'lucide-react'
-import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
-  const supabase = createClient()
+  const router = useRouter()
 
-  const handleGithubLogin = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          scopes: 'read:user repo',
-        },
-      })
-
-      if (error) {
-        toast.error('Failed to sign in with GitHub')
-        console.error('Login error:', error)
-      }
-    } catch (error) {
-      toast.error('An unexpected error occurred')
-      console.error('Login error:', error)
-    }
+  const handleGithubLogin = () => {
+    // Redirect to our custom GitHub OAuth endpoint
+    window.location.href = '/api/auth/github'
   }
 
   return (
