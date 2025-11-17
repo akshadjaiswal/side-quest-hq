@@ -10,14 +10,17 @@ import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import { ExternalLink, Copy, Check } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
-import { getUserId } from '@/lib/auth/client-session'
+import { useSession } from '@/hooks/use-session'
+import { useUserProfile } from '@/hooks/use-user-profile'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function SettingsPage() {
   const supabase = createClient()
-  const [isLoading, setIsLoading] = useState(true)
+  const queryClient = useQueryClient()
   const [isSaving, setIsSaving] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [userId, setUserId] = useState<string | null>(null)
+  const { data: session, isLoading: sessionLoading } = useSession()
+  const { data: profileData, isLoading: profileLoading } = useUserProfile(session?.userId)
 
   const [profile, setProfile] = useState({
     username: '',
@@ -28,47 +31,21 @@ export default function SettingsPage() {
   })
 
   useEffect(() => {
-    loadProfile()
-  }, [])
-
-  const loadProfile = async () => {
-    try {
-      const id = await getUserId()
-      if (!id) {
-        toast.error('Not authenticated')
-        return
-      }
-      setUserId(id)
-
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('id', id)
-        .single()
-
-      if (error) throw error
-
-      if (data) {
-        setProfile({
-          username: data.username || '',
-          bio: data.bio || '',
-          website_url: data.website_url || '',
-          twitter_handle: data.twitter_handle || '',
-          is_profile_public: data.is_profile_public,
-        })
-      }
-    } catch (error) {
-      console.error('Error loading profile:', error)
-      toast.error('Failed to load profile')
-    } finally {
-      setIsLoading(false)
+    if (profileData) {
+      setProfile({
+        username: profileData.username || '',
+        bio: profileData.bio || '',
+        website_url: profileData.website_url || '',
+        twitter_handle: profileData.twitter_handle || '',
+        is_profile_public: profileData.is_profile_public,
+      })
     }
-  }
+  }, [profileData])
 
   const handleSave = async () => {
     setIsSaving(true)
     try {
-      if (!userId) {
+      if (!session?.userId) {
         toast.error('Not authenticated')
         return
       }
@@ -81,9 +58,10 @@ export default function SettingsPage() {
           twitter_handle: profile.twitter_handle || null,
           is_profile_public: profile.is_profile_public,
         })
-        .eq('id', userId)
+        .eq('id', session.userId)
 
       if (error) throw error
+      queryClient.invalidateQueries({ queryKey: ['user-profile', session.userId] })
 
       toast.success('Profile updated successfully!')
     } catch (error) {
@@ -102,7 +80,7 @@ export default function SettingsPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  if (isLoading) {
+  if (sessionLoading || profileLoading) {
     return (
       <div className="p-8 flex items-center justify-center min-h-[60vh]">
         <div className="text-center">

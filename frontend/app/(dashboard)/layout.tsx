@@ -1,6 +1,6 @@
 import { Sidebar } from '@/components/dashboard/sidebar'
 import { Header } from '@/components/dashboard/header'
-import { createClient } from '@/lib/supabase/server'
+import { MobileNav } from '@/components/dashboard/mobile-nav'
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth/session'
 
@@ -15,27 +15,33 @@ export default async function DashboardLayout({
     redirect('/login')
   }
 
-  // Fetch user profile using session userId
-  const supabase = await createClient()
-  const { data: profile } = await supabase
-    .from('user_profiles')
-    .select('*')
-    .eq('id', session.userId)
-    .single()
+  const headerUser = {
+    username: session.username,
+    email: session.email,
+    avatar_url: session.avatarUrl,
+  }
 
   return (
-    <div className="h-screen flex">
-      {/* Sidebar */}
-      <aside className="w-64 flex-shrink-0">
-        <Sidebar />
-      </aside>
+    <div className="min-h-screen bg-background">
+      <div className="flex w-full flex-col lg:flex-row">
+        {/* Sidebar desktop */}
+        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0">
+          <Sidebar />
+        </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header user={profile} />
-        <main className="flex-1 overflow-auto bg-background">
-          {children}
-        </main>
+        {/* Main */}
+        <div className="flex min-h-screen flex-1 flex-col border-border lg:border-l">
+          <Header user={headerUser} />
+
+          {/* Mobile nav */}
+          <div className="border-b border-border bg-background-secondary/70 px-4 py-3 lg:hidden">
+            <MobileNav />
+          </div>
+
+          <main className="flex-1 bg-background px-4 py-6 sm:px-6 lg:px-10">
+            {children}
+          </main>
+        </div>
       </div>
     </div>
   )
