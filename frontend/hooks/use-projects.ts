@@ -11,16 +11,22 @@ import {
 } from '@/lib/supabase/queries/projects'
 import { ProjectFormData } from '@/types'
 import { toast } from 'sonner'
-import { getUserId } from '@/lib/auth/client-session'
+import { useSession } from '@/hooks/use-session'
 
 export function useProjects() {
+  const { data: session } = useSession()
+  const userId = session?.userId
+
   return useQuery({
-    queryKey: ['projects'],
-    queryFn: async () => {
-      const userId = await getUserId()
+    queryKey: ['projects', userId],
+    queryFn: () => {
       if (!userId) throw new Error('Not authenticated')
       return getProjects(userId)
     },
+    enabled: !!userId,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnMount: false,
   })
 }
 
@@ -29,27 +35,37 @@ export function useProject(id: string) {
     queryKey: ['project', id],
     queryFn: () => getProjectById(id),
     enabled: !!id,
+    staleTime: 2 * 60 * 1000,
   })
 }
 
 export function useProjectsByStatus(status: string) {
+  const { data: session } = useSession()
+  const userId = session?.userId
+
   return useQuery({
-    queryKey: ['projects', status],
-    queryFn: async () => {
-      const userId = await getUserId()
+    queryKey: ['projects', userId, status],
+    queryFn: () => {
       if (!userId) throw new Error('Not authenticated')
       return getProjectsByStatus(userId, status)
     },
+    enabled: !!userId,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnMount: false,
   })
 }
 
 export function useCreateProject() {
   const queryClient = useQueryClient()
+  const { data: session } = useSession()
+  const userId = session?.userId
 
   return useMutation({
     mutationFn: async (projectData: ProjectFormData) => {
-      const userId = await getUserId()
-      if (!userId) throw new Error('Not authenticated')
+      if (!userId) {
+        throw new Error('Not authenticated')
+      }
       return createProject(userId, projectData)
     },
     onSuccess: () => {
