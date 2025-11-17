@@ -10,18 +10,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { UserProfile } from '@/types'
+interface MinimalUser {
+  username?: string | null
+  email?: string | null
+  avatar_url?: string | null
+}
 import { LogOut, Settings, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { useQueryClient } from '@tanstack/react-query'
+import { fetchPublicProfile } from '@/hooks/use-stats'
 
 interface HeaderProps {
-  user: UserProfile | null
+  user: MinimalUser | null
   onAddProject?: () => void
 }
 
 export function Header({ user, onAddProject }: HeaderProps) {
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const handleSignOut = async () => {
     try {
@@ -34,12 +41,29 @@ export function Header({ user, onAddProject }: HeaderProps) {
     }
   }
 
+  const handleViewProfile = async () => {
+    if (!user?.username) return
+    try {
+      const username = user.username
+      if (username) {
+        await queryClient.prefetchQuery({
+          queryKey: ['public-profile', username],
+          queryFn: () => fetchPublicProfile(username),
+          staleTime: 3 * 60 * 1000,
+        })
+      }
+    } catch (error) {
+      // Ignore prefetch errors; navigation will fetch if needed
+    }
+    router.push(`/@${user.username}`)
+  }
+
   const userInitials = user?.username
     ? user.username.slice(0, 2).toUpperCase()
     : '??'
 
   return (
-    <header className="bg-background border-b border-border px-6 py-4">
+    <header className="bg-background border-b border-border px-6 lg:px-10 min-h-[80px] flex flex-col justify-center">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">
@@ -79,16 +103,9 @@ export function Header({ user, onAddProject }: HeaderProps) {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <a
-                  href={`/@${user?.username}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="cursor-pointer"
-                >
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  View Public Profile
-                </a>
+              <DropdownMenuItem onClick={handleViewProfile}>
+                <ExternalLink className="mr-2 h-4 w-4" />
+                View Public Profile
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/settings')}>
                 <Settings className="mr-2 h-4 w-4" />

@@ -56,26 +56,26 @@ export function StatsOverview({ projects }: StatsOverviewProps) {
   ]
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+    <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
       {statCards.map((stat) => {
         const Icon = typeof stat.icon === 'string' ? null : stat.icon
         return (
-          <Card key={stat.label} className="border-border bg-background-secondary">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-12 h-12 rounded-lg ${stat.bgColor || 'bg-primary/10'} flex items-center justify-center`}
-                >
-                  {Icon ? (
-                    <Icon className={`w-6 h-6 ${stat.color}`} />
-                  ) : (
-                    <span className="text-2xl">{stat.icon as string}</span>
-                  )}
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-foreground">{stat.value}</p>
-                  <p className="text-sm text-foreground-tertiary">{stat.label}</p>
-                </div>
+          <Card key={stat.label} className="border-border bg-background-secondary/70 shadow-sm">
+            <CardContent className="flex items-center gap-3 p-4 sm:p-5">
+              <div
+                className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl ${stat.bgColor || 'bg-primary/10'}`}
+              >
+                {Icon ? (
+                  <Icon className={`h-6 w-6 ${stat.color}`} />
+                ) : (
+                  <span className="text-2xl">{stat.icon as string}</span>
+                )}
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-widest text-foreground-tertiary">
+                  {stat.label}
+                </p>
+                <p className="text-2xl font-semibold text-foreground sm:text-3xl">{stat.value}</p>
               </div>
             </CardContent>
           </Card>

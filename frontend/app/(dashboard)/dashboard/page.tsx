@@ -7,7 +7,7 @@ import { AddProjectDialog } from '@/components/dashboard/add-project-dialog'
 import { GitHubImportDialog } from '@/components/github/import-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Search, Plus, Github } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { ProjectStatus } from '@/types'
@@ -53,34 +53,34 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="mx-auto flex w-full flex-col gap-6">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Your Projects</h1>
-            <p className="text-foreground-tertiary mt-1">
-              Track, manage, and honor all your creative attempts
+        <section className="flex flex-col gap-4 rounded-2xl border border-border bg-background-secondary/70 p-5 shadow-sm sm:flex-row sm:items-start sm:justify-between sm:p-6">
+          <div className="space-y-2">
+            <p className="text-sm text-foreground-tertiary">Dashboard</p>
+            <h1 className="text-3xl font-semibold text-foreground sm:text-4xl">Your projects</h1>
+            <p className="text-sm text-foreground-secondary">
+              Track, reflect, and celebrate every side quest from one responsive hub.
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <Button
               onClick={() => setImportDialogOpen(true)}
               variant="outline"
-              className="border-border"
+              className="w-full border-border sm:w-auto"
             >
-              <Github className="w-5 h-5 mr-2" />
-              Import from GitHub
+              <Github className="mr-2 h-4 w-4" />
+              Import GitHub repos
             </Button>
             <Button
               onClick={() => setAddDialogOpen(true)}
-              className="bg-primary hover:bg-primary-hover text-white"
+              className="w-full bg-primary text-white hover:bg-primary-hover sm:w-auto"
             >
-              <Plus className="w-5 h-5 mr-2" />
-              Add Project
+              <Plus className="mr-2 h-4 w-4" />
+              Add project
             </Button>
           </div>
-        </div>
+        </section>
 
         {projects.length > 0 ? (
           <>
@@ -88,27 +88,43 @@ export default function DashboardPage() {
             <StatsOverview projects={projects} />
 
             {/* Filters */}
-            <div className="mb-6 space-y-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary w-5 h-5" />
-                <Input
-                  placeholder="Search projects by name, description, or tech..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+            <section className="rounded-2xl border border-border bg-background-secondary/70 p-5 shadow-sm sm:p-6">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center">
+                <div className="relative flex-1">
+                  <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-tertiary" />
+                  <Input
+                    placeholder="Search by name, description, or tech…"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="h-11 w-full rounded-xl border-border bg-background pl-11 text-sm"
+                  />
+                </div>
 
-              <Tabs value={selectedStatus} onValueChange={(v) => setSelectedStatus(v as any)}>
-                <TabsList>
-                  <TabsTrigger value="all">All</TabsTrigger>
-                  <TabsTrigger value="active">Active</TabsTrigger>
-                  <TabsTrigger value="paused">Paused</TabsTrigger>
-                  <TabsTrigger value="abandoned">Abandoned</TabsTrigger>
-                  <TabsTrigger value="shipped">Shipped</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
+                <Tabs
+                  value={selectedStatus}
+                  onValueChange={(value) => setSelectedStatus(value as 'all' | ProjectStatus)}
+                  className="w-full md:w-auto"
+                >
+                  <TabsList className="flex w-full gap-2 overflow-x-auto rounded-2xl bg-background p-1 sm:grid sm:grid-cols-5">
+                    {[
+                      { value: 'all', label: 'All' },
+                      { value: 'active', label: 'Active' },
+                      { value: 'paused', label: 'Paused' },
+                      { value: 'abandoned', label: 'Abandoned' },
+                      { value: 'shipped', label: 'Shipped' },
+                    ].map((tab) => (
+                      <TabsTrigger
+                        key={tab.value}
+                        value={tab.value}
+                        className="flex-1 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium data-[state=active]:bg-primary/10 data-[state=active]:text-primary sm:flex-none"
+                      >
+                        {tab.label}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </Tabs>
+              </div>
+            </section>
 
             {/* Projects Grid */}
             <ProjectGrid
@@ -121,26 +137,39 @@ export default function DashboardPage() {
             />
           </>
         ) : (
-          <div className="bg-background-secondary border border-border rounded-lg p-12 text-center">
-            <div className="text-6xl mb-4">💀</div>
-            <h2 className="text-2xl font-semibold text-foreground mb-2">No projects yet</h2>
-            <p className="text-foreground-tertiary mb-6">
-              Start by adding your first project to begin cataloging your creative journey
-            </p>
-            <Button
-              onClick={() => setAddDialogOpen(true)}
-              className="bg-primary hover:bg-primary-hover text-white"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Add Your First Project
-            </Button>
-          </div>
+          <section className="rounded-2xl border border-dashed border-border bg-background-secondary/50 p-10 text-center shadow-sm sm:p-12">
+            <div className="mx-auto flex max-w-lg flex-col items-center gap-4">
+              <div className="text-6xl">💀</div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-semibold text-foreground">No projects yet</h2>
+                <p className="text-sm text-foreground-tertiary">
+                  Start by logging your first quest or import a GitHub repo to build your archive.
+                </p>
+              </div>
+              <div className="flex w-full flex-col gap-3 sm:flex-row">
+                <Button
+                  onClick={() => setAddDialogOpen(true)}
+                  className="w-full bg-primary text-white hover:bg-primary-hover"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add project
+                </Button>
+                <Button
+                  onClick={() => setImportDialogOpen(true)}
+                  variant="outline"
+                  className="w-full border-border"
+                >
+                  <Github className="mr-2 h-4 w-4" />
+                  Import from GitHub
+                </Button>
+              </div>
+            </div>
+          </section>
         )}
 
         {/* Dialogs */}
         <AddProjectDialog open={addDialogOpen} onOpenChange={setAddDialogOpen} />
         <GitHubImportDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} />
-      </div>
     </div>
   )
 }
