@@ -22,26 +22,26 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="flex w-full flex-col lg:flex-row">
-        {/* Sidebar desktop */}
-        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0">
-          <Sidebar />
-        </aside>
+    <div className="flex h-screen bg-background">
+      {/* Sidebar desktop */}
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:border-r lg:border-border lg:bg-background lg:overflow-y-auto">
+        <Sidebar />
+      </aside>
 
-        {/* Main */}
-        <div className="flex min-h-screen flex-1 flex-col border-border lg:border-l">
+      {/* Main */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="shrink-0">
           <Header user={headerUser} />
 
           {/* Mobile nav */}
           <div className="border-b border-border bg-background-secondary/70 px-4 py-3 lg:hidden">
             <MobileNav />
           </div>
-
-          <main className="flex-1 bg-background px-4 py-6 sm:px-6 lg:px-10">
-            {children}
-          </main>
         </div>
+
+        <main className="flex-1 overflow-y-auto bg-background px-4 py-6 sm:px-6 lg:px-10">
+          {children}
+        </main>
       </div>
     </div>
   )
