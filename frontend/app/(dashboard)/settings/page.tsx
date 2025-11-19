@@ -94,14 +94,14 @@ export default function SettingsPage() {
   const profileUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/@${profile.username}`
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Settings</h1>
           <p className="text-foreground-tertiary">Manage your profile and preferences</p>
         </div>
 
-        <div className="bg-background-secondary border border-border rounded-lg p-8 space-y-8">
+        <div className="bg-background-secondary border border-border rounded-2xl p-5 sm:p-8 space-y-8">
           {/* Public Profile */}
           <div>
             <h2 className="text-xl font-semibold text-foreground mb-4">Public Profile</h2>
@@ -117,15 +117,19 @@ export default function SettingsPage() {
               </div>
 
               {/* Profile URL */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label>Profile URL</Label>
-                <div className="flex gap-2">
-                  <Input value={profileUrl} disabled className="bg-background-tertiary" />
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Input
+                    value={profileUrl}
+                    disabled
+                    className="bg-background-tertiary"
+                  />
                   <Button
                     type="button"
                     variant="outline"
                     onClick={copyProfileLink}
-                    className="shrink-0"
+                    className="w-full shrink-0 sm:w-auto"
                   >
                     {copied ? (
                       <Check className="w-4 h-4" />
@@ -133,8 +137,13 @@ export default function SettingsPage() {
                       <Copy className="w-4 h-4" />
                     )}
                   </Button>
-                  <a href={profileUrl} target="_blank" rel="noopener noreferrer">
-                    <Button type="button" variant="outline">
+                  <a
+                    href={profileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto"
+                  >
+                    <Button type="button" variant="outline" className="w-full sm:w-auto">
                       <ExternalLink className="w-4 h-4" />
                     </Button>
                   </a>
@@ -142,8 +151,8 @@ export default function SettingsPage() {
               </div>
 
               {/* Public Toggle */}
-              <div className="flex items-center justify-between py-3 px-4 bg-background rounded-lg border border-border">
-                <div>
+              <div className="flex flex-col gap-3 rounded-xl border border-border bg-background px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="text-center sm:text-left">
                   <Label htmlFor="public-profile" className="text-base font-medium">
                     Public Profile
                   </Label>
@@ -183,7 +192,7 @@ export default function SettingsPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="website">Website</Label>
                 <Input
