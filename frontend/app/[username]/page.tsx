@@ -169,16 +169,45 @@ export default function PublicProfilePage() {
 
         {/* Projects */}
         <div>
-          <div className="flex justify-between items-center mb-6">
+          <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <h2 className="text-2xl font-semibold text-foreground">Projects</h2>
 
-            <Tabs value={selectedStatus} onValueChange={(v) => setSelectedStatus(v as any)}>
-              <TabsList>
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="active">Active</TabsTrigger>
-                <TabsTrigger value="paused">Paused</TabsTrigger>
-                <TabsTrigger value="abandoned">Abandoned</TabsTrigger>
-                <TabsTrigger value="shipped">Shipped</TabsTrigger>
+            <Tabs
+              value={selectedStatus}
+              onValueChange={(v) => setSelectedStatus(v as 'all' | ProjectStatus)}
+              className="w-full md:w-auto"
+            >
+              <TabsList className="h-auto flex w-full flex-wrap gap-2 rounded-2xl bg-background-secondary/60 p-1 md:flex-nowrap md:justify-end">
+                <TabsTrigger
+                  value="all"
+                  className="flex-1 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium data-[state=active]:bg-primary/10 data-[state=active]:text-primary md:flex-none"
+                >
+                  All
+                </TabsTrigger>
+                <TabsTrigger
+                  value="active"
+                  className="flex-1 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium data-[state=active]:bg-primary/10 data-[state=active]:text-primary md:flex-none"
+                >
+                  Active
+                </TabsTrigger>
+                <TabsTrigger
+                  value="paused"
+                  className="flex-1 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium data-[state=active]:bg-primary/10 data-[state=active]:text-primary md:flex-none"
+                >
+                  Paused
+                </TabsTrigger>
+                <TabsTrigger
+                  value="abandoned"
+                  className="flex-1 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium data-[state=active]:bg-primary/10 data-[state=active]:text-primary md:flex-none"
+                >
+                  Abandoned
+                </TabsTrigger>
+                <TabsTrigger
+                  value="shipped"
+                  className="flex-1 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium data-[state=active]:bg-primary/10 data-[state=active]:text-primary md:flex-none"
+                >
+                  Shipped
+                </TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
