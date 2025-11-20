@@ -1,6 +1,7 @@
 import { Sidebar } from '@/components/dashboard/sidebar'
 import { Header } from '@/components/dashboard/header'
 import { MobileNav } from '@/components/dashboard/mobile-nav'
+import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth/session'
 
@@ -39,8 +40,13 @@ export default async function DashboardLayout({
           </div>
         </div>
 
-        <main className="flex-1 overflow-y-auto bg-background px-4 py-6 sm:px-6 lg:px-10">
-          {children}
+        <main className="flex-1 overflow-y-auto bg-background">
+          <div className="min-h-full flex flex-col p-6 lg:p-8">
+            <div className="flex-1">
+              {children}
+            </div>
+            <DashboardFooter />
+          </div>
         </main>
       </div>
     </div>

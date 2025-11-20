@@ -11,6 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Search, Plus, Github } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { ProjectStatus } from '@/types'
+import { motion } from 'framer-motion'
 
 export default function DashboardPage() {
   const { data: projects = [], isLoading } = useProjects()
@@ -45,20 +46,38 @@ export default function DashboardPage() {
     return (
       <div className="p-8 flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className="text-6xl mb-4 animate-pulse">💀</div>
-          <p className="text-foreground-tertiary">Loading your projects...</p>
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 10, -10, 0]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="text-6xl mb-4"
+          >
+            💀
+          </motion.div>
+          <p className="text-foreground-secondary font-medium mb-4">Loading your projects...</p>
+          <div className="flex gap-2 justify-center">
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="mx-auto flex w-full flex-col gap-6">
+    <div className="flex w-full flex-col gap-4">
         {/* Header */}
-        <section className="flex flex-col gap-4 rounded-2xl border border-border bg-background-secondary/70 p-5 shadow-sm sm:flex-row sm:items-start sm:justify-between sm:p-6">
+        <section className="flex flex-col gap-4 rounded-2xl glass border border-border/50 p-5 shadow-lg sm:flex-row sm:items-start sm:justify-between sm:p-6">
           <div className="space-y-2">
-            <p className="text-sm text-foreground-tertiary">Dashboard</p>
-            <h1 className="text-3xl font-semibold text-foreground sm:text-4xl">Your projects</h1>
+            <p className="text-sm text-foreground-tertiary font-medium">Dashboard</p>
+            <h1 className="text-3xl font-bold text-foreground sm:text-4xl">Your projects</h1>
             <p className="text-sm text-foreground-secondary">
               Track, reflect, and celebrate every side quest from one responsive hub.
             </p>
@@ -67,14 +86,14 @@ export default function DashboardPage() {
             <Button
               onClick={() => setImportDialogOpen(true)}
               variant="outline"
-              className="w-full border-border sm:w-auto"
+              className="w-full border-border hover:border-primary/50 transition-all duration-200 sm:w-auto group"
             >
-              <Github className="mr-2 h-4 w-4" />
+              <Github className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform" />
               Import GitHub repos
             </Button>
             <Button
               onClick={() => setAddDialogOpen(true)}
-              className="w-full bg-primary text-white hover:bg-primary-hover sm:w-auto"
+              className="w-full bg-primary text-white hover:bg-primary-hover sm:w-auto glow-hover hover:scale-105 transition-all duration-200"
             >
               <Plus className="mr-2 h-4 w-4" />
               Add project
@@ -88,7 +107,7 @@ export default function DashboardPage() {
             <StatsOverview projects={projects} />
 
             {/* Filters */}
-            <section className="rounded-2xl border border-border bg-background-secondary/70 p-5 shadow-sm sm:p-6">
+            <section className="rounded-2xl glass border border-border/50 p-5 shadow-lg sm:p-6">
               <div className="flex flex-col gap-4 md:flex-row md:items-center">
                 <div className="relative flex-1">
                   <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-tertiary" />
@@ -96,7 +115,7 @@ export default function DashboardPage() {
                     placeholder="Search by name, description, or tech…"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-11 w-full rounded-xl border-border bg-background pl-11 text-sm"
+                    className="h-11 w-full rounded-xl border-border bg-background pl-11 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                   />
                 </div>
 
@@ -137,19 +156,19 @@ export default function DashboardPage() {
             />
           </>
         ) : (
-          <section className="rounded-2xl border border-dashed border-border bg-background-secondary/50 p-10 text-center shadow-sm sm:p-12">
+          <section className="rounded-2xl border border-dashed border-border glass p-10 text-center shadow-lg sm:p-12">
             <div className="mx-auto flex max-w-lg flex-col items-center gap-4">
-              <div className="text-6xl">💀</div>
+              <div className="text-6xl animate-bounce-subtle">💀</div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-semibold text-foreground">No projects yet</h2>
-                <p className="text-sm text-foreground-tertiary">
+                <h2 className="text-2xl font-bold text-foreground">No projects yet</h2>
+                <p className="text-sm text-foreground-secondary">
                   Start by logging your first quest or import a GitHub repo to build your archive.
                 </p>
               </div>
               <div className="flex w-full flex-col gap-3 sm:flex-row">
                 <Button
                   onClick={() => setAddDialogOpen(true)}
-                  className="w-full bg-primary text-white hover:bg-primary-hover"
+                  className="w-full bg-primary text-white hover:bg-primary-hover glow-hover hover:scale-105 transition-all duration-200"
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Add project
@@ -157,7 +176,7 @@ export default function DashboardPage() {
                 <Button
                   onClick={() => setImportDialogOpen(true)}
                   variant="outline"
-                  className="w-full border-border"
+                  className="w-full border-border hover:border-primary/50 transition-all duration-200"
                 >
                   <Github className="mr-2 h-4 w-4" />
                   Import from GitHub

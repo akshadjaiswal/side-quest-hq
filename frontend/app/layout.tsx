@@ -1,8 +1,14 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { DM_Sans, Inter } from 'next/font/google'
 import './globals.css'
 import { QueryProvider } from '@/lib/query-provider'
 import { Toaster } from '@/components/ui/sonner'
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-dm-sans',
+})
 
 const inter = Inter({
   subsets: ['latin'],
@@ -30,7 +36,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${dmSans.variable} ${inter.variable} font-sans`}>
         <QueryProvider>
           {children}
           <Toaster position="top-right" />
