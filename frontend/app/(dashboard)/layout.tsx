@@ -40,11 +40,13 @@ export default async function DashboardLayout({
           </div>
         </div>
 
-        <main className="flex-1 overflow-y-auto bg-background px-4 py-6 sm:px-6 lg:px-10 flex flex-col">
-          <div className="flex-1">
-            {children}
+        <main className="flex-1 overflow-y-auto bg-background">
+          <div className="min-h-full flex flex-col p-6 lg:p-8">
+            <div className="flex-1">
+              {children}
+            </div>
+            <DashboardFooter />
           </div>
-          <DashboardFooter />
         </main>
       </div>
     </div>

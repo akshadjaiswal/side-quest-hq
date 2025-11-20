@@ -2,11 +2,15 @@
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { GithubIcon } from 'lucide-react'
+import { GithubIcon, Loader2 } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useState } from 'react'
 
 export default function LoginPage() {
+  const [isLoading, setIsLoading] = useState(false)
+
   const handleGithubLogin = () => {
+    setIsLoading(true)
     window.location.href = '/api/auth/github'
   }
 
@@ -90,11 +94,21 @@ export default function LoginPage() {
             >
               <Button
                 onClick={handleGithubLogin}
-                className="w-full bg-primary hover:bg-primary-hover text-white font-semibold py-6 text-lg glow-hover group transition-all duration-200 hover:scale-105"
+                disabled={isLoading}
+                className="w-full bg-primary hover:bg-primary-hover text-white font-semibold py-6 text-lg glow-hover group transition-all duration-200 hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
                 size="lg"
               >
-                <GithubIcon className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform duration-200" />
-                Continue with GitHub
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Signing in...
+                  </>
+                ) : (
+                  <>
+                    <GithubIcon className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform duration-200" />
+                    Continue with GitHub
+                  </>
+                )}
               </Button>
             </motion.div>
 
