@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useSmartNavigation } from "@/hooks/use-auth-redirect";
 
 export function Header() {
+  const { navigate, isLoading, isAuthenticated } = useSmartNavigation()
+
   return (
     <nav className="glass border-b border-border sticky top-0 z-50">
       <div className="container mx-auto px-4 lg:px-6 py-4">
@@ -19,14 +22,14 @@ export function Header() {
           </Link>
 
           {/* CTA Button */}
-          <Link href="/login">
-            <Button
-              size="lg"
-              className="bg-primary hover:bg-primary-hover text-white font-semibold transition-all duration-200 hover:shadow-lg hover:scale-105 glow-hover"
-            >
-              Get Started
-            </Button>
-          </Link>
+          <Button
+            size="lg"
+            onClick={navigate}
+            disabled={isLoading}
+            className="bg-primary hover:bg-primary-hover text-white font-semibold transition-all duration-200 hover:shadow-lg hover:scale-105 glow-hover disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? 'Loading...' : isAuthenticated ? 'Dashboard' : 'Get Started'}
+          </Button>
         </div>
       </div>
     </nav>

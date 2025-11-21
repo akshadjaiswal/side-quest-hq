@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, Code2, Github, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useSmartNavigation } from "@/hooks/use-auth-redirect";
+import Link from "next/link";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -29,6 +30,8 @@ const itemVariants = {
 };
 
 export function Hero() {
+  const { navigate, isLoading, isAuthenticated, destination } = useSmartNavigation()
+
   return (
     <section className="relative container mx-auto px-4 lg:px-6 pt-16 pb-12 md:pt-32 md:pb-24 overflow-hidden">
       <motion.div
@@ -74,15 +77,26 @@ export function Hero() {
           variants={itemVariants}
           className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
         >
-          <Link href="/login" className="w-full sm:w-auto">
-            <Button
-              size="lg"
-              className="w-full sm:w-auto px-8 py-6 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold text-lg transition-all duration-200 hover:shadow-xl hover:scale-105 glow-hover flex items-center gap-2 justify-center group"
-            >
-              Start Tracking Projects
-              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </Link>
+          <Button
+            size="lg"
+            onClick={navigate}
+            disabled={isLoading}
+            className="w-full sm:w-auto px-8 py-6 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold text-lg transition-all duration-200 hover:shadow-xl hover:scale-105 glow-hover flex items-center gap-2 justify-center group disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? (
+              'Loading...'
+            ) : isAuthenticated ? (
+              <>
+                Go to Dashboard
+                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </>
+            ) : (
+              <>
+                Start Tracking Projects
+                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </>
+            )}
+          </Button>
           <Link href="#features" className="w-full sm:w-auto">
             <Button
               size="lg"
