@@ -9,7 +9,7 @@ import { getSession } from '@/lib/auth/session'
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify authentication using custom JWT session
@@ -22,7 +22,7 @@ export async function GET(
     }
 
     const supabase = await createClient()
-    const { id } = params
+    const { id } = await params
 
     // Fetch project
     const { data: project, error } = await supabase
@@ -63,7 +63,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify authentication using custom JWT session
@@ -76,7 +76,7 @@ export async function PUT(
     }
 
     const supabase = await createClient()
-    const { id } = params
+    const { id } = await params
 
     // Parse request body
     const projectData: Partial<ProjectFormData> = await request.json()
@@ -134,7 +134,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify authentication using custom JWT session
@@ -147,7 +147,7 @@ export async function DELETE(
     }
 
     const supabase = await createClient()
-    const { id } = params
+    const { id } = await params
 
     // Delete project (RLS will ensure user owns it)
     const { error } = await supabase
