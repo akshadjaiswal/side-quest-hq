@@ -140,7 +140,7 @@ export function Footer() {
                 <Github className="h-5 w-5" />
               </a>
               <a
-                href="https://twitter.com/akshadjaiswal"
+                href="https://x.com/akshad_999"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="X (formerly Twitter)"
