@@ -19,7 +19,9 @@ export function useSession() {
       })
 
       if (!response.ok) {
-        throw new Error('Not authenticated')
+        // Return null instead of throwing error when not authenticated
+        // This allows components to gracefully handle unauthenticated state
+        return null
       }
 
       return (await response.json()) as SessionResponse

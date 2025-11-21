@@ -9,7 +9,7 @@ import {
   deleteProject,
   getProjectsByStatus,
 } from '@/lib/supabase/queries/projects'
-import { ProjectFormData } from '@/types'
+import { ProjectFormData, SideProject } from '@/types'
 import { toast } from 'sonner'
 import { useSession } from '@/hooks/use-session'
 
@@ -68,8 +68,17 @@ export function useCreateProject() {
       }
       return createProject(userId, projectData)
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] })
+    onSuccess: (newProject) => {
+      // Optimistic update: immediately add new project to cache
+      if (userId) {
+        queryClient.setQueryData<SideProject[]>(
+          ['projects', userId],
+          (oldProjects) => [...(oldProjects || []), newProject]
+        )
+      }
+
+      // Force refetch to ensure consistency with database
+      queryClient.refetchQueries({ queryKey: ['projects'], exact: false })
       toast.success('Project created successfully!')
     },
     onError: (error) => {
@@ -81,12 +90,28 @@ export function useCreateProject() {
 
 export function useUpdateProject() {
   const queryClient = useQueryClient()
+  const { data: session } = useSession()
+  const userId = session?.userId
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<ProjectFormData> }) =>
       updateProject(id, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] })
+    onSuccess: (updatedProject, variables) => {
+      // Optimistic update: immediately update projects list cache
+      if (userId) {
+        queryClient.setQueryData<SideProject[]>(
+          ['projects', userId],
+          (oldProjects) => {
+            if (!oldProjects) return oldProjects
+            return oldProjects.map(p =>
+              p.id === variables.id ? { ...p, ...updatedProject } : p
+            )
+          }
+        )
+      }
+
+      // Force refetch to ensure consistency with database
+      queryClient.refetchQueries({ queryKey: ['projects'], exact: false })
       queryClient.invalidateQueries({ queryKey: ['project', variables.id] })
       toast.success('Project updated successfully!')
     },
@@ -99,11 +124,22 @@ export function useUpdateProject() {
 
 export function useDeleteProject() {
   const queryClient = useQueryClient()
+  const { data: session } = useSession()
+  const userId = session?.userId
 
   return useMutation({
     mutationFn: (id: string) => deleteProject(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] })
+    onSuccess: (_, deletedId) => {
+      // Optimistic update: immediately remove project from cache
+      if (userId) {
+        queryClient.setQueryData<SideProject[]>(
+          ['projects', userId],
+          (oldProjects) => oldProjects?.filter(p => p.id !== deletedId) || []
+        )
+      }
+
+      // Force refetch to ensure consistency with database
+      queryClient.refetchQueries({ queryKey: ['projects'], exact: false })
       toast.success('Project deleted successfully!')
     },
     onError: (error) => {
