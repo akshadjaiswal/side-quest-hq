@@ -112,7 +112,7 @@
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/yourusername/sidequesthq.git
+git clone https://github.com/akshadjaiswal/sidequesthq.git
 cd sidequesthq/frontend
 npm install
 ```
@@ -206,9 +206,9 @@ MIT License.
 
 ## 💬 Support
 
-- Bugs → open an issue  
-- Ideas → start a discussion  
-- Vibes → keep building cool quests ✨
+- **Bugs** → [Open an issue](https://github.com/akshadjaiswal/sidequesthq/issues)
+- **Ideas** → [Start a discussion](https://github.com/akshadjaiswal/sidequesthq/discussions)
+- **Questions** → Check out the docs in `my_docs/`
 
 ---
 
