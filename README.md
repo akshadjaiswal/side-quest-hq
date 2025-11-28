@@ -279,7 +279,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 - **Bugs** → [Open an issue](https://github.com/akshadjaiswal/sidequesthq/issues)
 - **Ideas** → [Start a discussion](https://github.com/akshadjaiswal/sidequesthq/discussions)
-- **Questions** → Check out the docs in `my_docs/`
+
 
 ---
 
