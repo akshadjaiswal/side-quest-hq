@@ -10,6 +10,7 @@ import { formatDate, formatDateRange } from '@/lib/utils/date'
 import { Github, ExternalLink, Edit, Trash2, ArrowLeft } from 'lucide-react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
+import { useSession } from '@/hooks/use-session'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +30,10 @@ export default function ProjectDetailPage() {
 
   const { data: project, isLoading } = useProject(projectId)
   const deleteProject = useDeleteProject()
+  const { data: session } = useSession()
+
+  // Check if current user owns this project
+  const isOwner = session?.userId === project?.user_id
 
   const handleDelete = async () => {
     await deleteProject.mutateAsync(projectId)
@@ -92,39 +97,41 @@ export default function ProjectDetailPage() {
             <p className="text-lg text-foreground-secondary">{project.description}</p>
           </div>
 
-          <div className="flex gap-2">
-            <Link href={`/projects/${project.id}/edit`}>
-              <Button variant="outline">
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
-            </Link>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive">
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
+          {isOwner && (
+            <div className="flex gap-2">
+              <Link href={`/projects/${project.id}/edit`}>
+                <Button variant="outline">
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit
                 </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will permanently delete "{project.name}". This action cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleDelete}
-                    className="bg-red-600 hover:bg-red-700"
-                  >
-                    Delete Project
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
+              </Link>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete "{project.name}". This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDelete}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      Delete Project
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          )}
         </div>
 
         <Separator className="my-6" />

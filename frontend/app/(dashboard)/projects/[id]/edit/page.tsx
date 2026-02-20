@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
+import { useSession } from '@/hooks/use-session'
 import { ProjectFormData } from '@/lib/validations/project-schema'
 
 export default function EditProjectPage() {
@@ -15,6 +16,7 @@ export default function EditProjectPage() {
 
   const { data: project, isLoading } = useProject(projectId)
   const updateProject = useUpdateProject()
+  const { data: session } = useSession()
 
   const handleSubmit = async (data: ProjectFormData) => {
     await updateProject.mutateAsync({ id: projectId, data })
@@ -27,6 +29,24 @@ export default function EditProjectPage() {
         <div className="text-center">
           <div className="text-6xl mb-4 animate-pulse">💀</div>
           <p className="text-foreground-tertiary">Loading project...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Authorization check: verify user owns this project
+  if (project && session && project.user_id !== session.userId) {
+    return (
+      <div className="p-8 flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🔒</div>
+          <h2 className="text-2xl font-semibold text-foreground mb-2">Unauthorized</h2>
+          <p className="text-foreground-tertiary mb-6">
+            You don't have permission to edit this project
+          </p>
+          <Link href="/dashboard">
+            <Button variant="outline">Back to Dashboard</Button>
+          </Link>
         </div>
       </div>
     )
