@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/server'
 import { ProjectFormData } from '@/types'
 import { getSession } from '@/lib/auth/session'
 
@@ -21,7 +21,7 @@ export async function GET(
       )
     }
 
-    const supabase = await createClient()
+    const supabase = createServiceRoleClient()
     const { id } = await params
 
     // Fetch project
@@ -75,7 +75,7 @@ export async function PUT(
       )
     }
 
-    const supabase = await createClient()
+    const supabase = createServiceRoleClient()
     const { id } = await params
 
     // Parse request body
@@ -146,7 +146,7 @@ export async function DELETE(
       )
     }
 
-    const supabase = await createClient()
+    const supabase = createServiceRoleClient()
     const { id } = await params
 
     // Delete project (RLS will ensure user owns it)

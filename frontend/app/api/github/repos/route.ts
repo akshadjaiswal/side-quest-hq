@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/server'
 import { GitHubClient } from '@/lib/github/client'
 import { getSession } from '@/lib/auth/session'
 
@@ -12,7 +12,7 @@ export async function GET() {
     }
 
     // Fetch GitHub token from user_profiles table
-    const supabase = await createClient()
+    const supabase = createServiceRoleClient()
     const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
       .select('github_access_token')

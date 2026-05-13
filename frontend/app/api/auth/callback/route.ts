@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { exchangeCodeForToken } from '@/lib/github/oauth'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/server'
 import { createSession, setSessionCookie } from '@/lib/auth/session'
 
 export async function GET(request: NextRequest) {
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     const primaryEmail = emails.find((e: any) => e.primary)?.email || githubUser.email
 
     // Create Supabase client (for database only, not auth)
-    const supabase = await createClient()
+    const supabase = createServiceRoleClient()
 
     // Check if user already exists
     const { data: existingUser } = await supabase

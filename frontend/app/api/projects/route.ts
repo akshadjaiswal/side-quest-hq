@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/server'
 import { ProjectFormData } from '@/types'
 import { generateSlug } from '@/lib/utils/slug'
 import { getSession } from '@/lib/auth/session'
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
+    const supabase = createServiceRoleClient()
 
     // Get status filter from query params
     const { searchParams } = new URL(request.url)
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
+    const supabase = createServiceRoleClient()
 
     // Parse request body
     const projectData: ProjectFormData = await request.json()
