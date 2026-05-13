@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { LayoutDashboard, Skull, Settings, Home } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -13,6 +13,7 @@ const navigation = [
 ]
 
 export function Sidebar() {
+  const shouldReduceMotion = useReducedMotion()
   const pathname = usePathname()
 
   return (
@@ -50,7 +51,7 @@ export function Sidebar() {
                   layoutId="activeNav"
                   className="absolute inset-0 bg-primary rounded-xl"
                   style={{ zIndex: -1 }}
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  transition={shouldReduceMotion ? { duration: 0 } : { type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}
               <item.icon className={cn(

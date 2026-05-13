@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Sparkles, Code2, Github, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSmartNavigation } from "@/hooks/use-auth-redirect";
@@ -30,13 +30,14 @@ const itemVariants = {
 };
 
 export function Hero() {
+  const shouldReduceMotion = useReducedMotion()
   const { navigate, isLoading, isAuthenticated, destination } = useSmartNavigation()
 
   return (
     <section className="relative container mx-auto px-4 lg:px-6 pt-16 pb-12 md:pt-32 md:pb-24 overflow-hidden">
       <motion.div
-        variants={containerVariants}
-        initial="hidden"
+        variants={shouldReduceMotion ? undefined : containerVariants}
+        initial={shouldReduceMotion ? false : "hidden"}
         animate="visible"
         className="max-w-5xl mx-auto text-center relative z-10"
       >

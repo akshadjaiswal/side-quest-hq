@@ -8,7 +8,8 @@ import { Progress } from '@/components/ui/progress'
 import { SideProject } from '@/types'
 import { formatDate } from '@/lib/utils/date'
 import { Github, ExternalLink } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
+import Image from 'next/image'
 
 interface ProjectCardProps {
   project: SideProject
@@ -16,6 +17,8 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project, onClick }: ProjectCardProps) {
+  const shouldReduceMotion = useReducedMotion()
+
   const placeholder = (
     <div className="flex h-40 items-center justify-center rounded-t-2xl bg-gradient-to-br from-primary/5 via-background-tertiary to-primary/10 sm:h-48 relative overflow-hidden">
       <div className="absolute inset-0 shimmer"></div>
@@ -25,21 +28,23 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -8, transition: { duration: 0.2 } }}
-      transition={{ duration: 0.3 }}
+      whileHover={shouldReduceMotion ? {} : { y: -8, transition: { duration: 0.2 } }}
+      transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3 }}
     >
       <Card
         className="group flex h-full flex-col overflow-hidden rounded-2xl glass border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-2xl cursor-pointer"
         onClick={onClick}
       >
         {project.cover_image_url ? (
-          <div className="h-40 overflow-hidden rounded-t-2xl sm:h-48">
-            <img
+          <div className="relative h-40 overflow-hidden rounded-t-2xl sm:h-48">
+            <Image
               src={project.cover_image_url}
               alt={project.name}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
           </div>
         ) : (
@@ -79,9 +84,9 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
             </div>
             <div className="relative overflow-hidden rounded-full h-2 bg-background-tertiary">
               <motion.div
-                initial={{ width: 0 }}
+                initial={{ width: shouldReduceMotion ? `${project.progress_percentage}%` : 0 }}
                 animate={{ width: `${project.progress_percentage}%` }}
-                transition={{ duration: 1, ease: "easeOut" }}
+                transition={shouldReduceMotion ? { duration: 0 } : { duration: 1, ease: "easeOut" }}
                 className="h-full bg-gradient-to-r from-primary to-primary-hover rounded-full"
               />
             </div>

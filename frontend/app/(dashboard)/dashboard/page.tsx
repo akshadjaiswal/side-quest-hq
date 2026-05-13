@@ -11,9 +11,10 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Search, Plus, Github } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { ProjectStatus } from '@/types'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 export default function DashboardPage() {
+  const shouldReduceMotion = useReducedMotion()
   const { data: projects = [], isLoading } = useProjects()
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [importDialogOpen, setImportDialogOpen] = useState(false)
@@ -47,11 +48,11 @@ export default function DashboardPage() {
       <div className="p-8 flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <motion.div
-            animate={{
+            animate={shouldReduceMotion ? {} : {
               scale: [1, 1.2, 1],
               rotate: [0, 10, -10, 0]
             }}
-            transition={{
+            transition={shouldReduceMotion ? { duration: 0 } : {
               duration: 2,
               repeat: Infinity,
               ease: "easeInOut"

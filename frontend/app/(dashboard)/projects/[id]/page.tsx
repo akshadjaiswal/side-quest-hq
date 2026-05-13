@@ -10,6 +10,7 @@ import { formatDate, formatDateRange } from '@/lib/utils/date'
 import { Github, ExternalLink, Edit, Trash2, ArrowLeft } from 'lucide-react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useSession } from '@/hooks/use-session'
 import {
   AlertDialog,
@@ -78,11 +79,14 @@ export default function ProjectDetailPage() {
 
         {/* Cover Image */}
         {project.cover_image_url && (
-          <div className="h-64 rounded-lg overflow-hidden mb-6">
-            <img
+          <div className="relative h-64 rounded-lg overflow-hidden mb-6">
+            <Image
               src={project.cover_image_url}
               alt={project.name}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              sizes="(max-width: 896px) 100vw, 896px"
+              priority
             />
           </div>
         )}

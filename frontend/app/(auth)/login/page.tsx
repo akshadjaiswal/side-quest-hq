@@ -3,10 +3,11 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { GithubIcon, Loader2 } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { useState } from 'react'
 
 export default function LoginPage() {
+  const shouldReduceMotion = useReducedMotion()
   const [isLoading, setIsLoading] = useState(false)
 
   const handleGithubLogin = () => {
@@ -43,22 +44,22 @@ export default function LoginPage() {
 
       {/* Login Card */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="relative z-10"
       >
         <Card className="w-full max-w-md glass border border-border/50">
           <CardHeader className="space-y-4 text-center">
             <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
+              initial={shouldReduceMotion ? false : { scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.5, delay: 0.2 }}
               className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center"
             >
               <motion.span
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                animate={shouldReduceMotion ? {} : { scale: [1, 1.1, 1] }}
+                transition={shouldReduceMotion ? { duration: 0 } : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 className="text-4xl"
               >
                 💀
@@ -66,9 +67,9 @@ export default function LoginPage() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.5, delay: 0.3 }}
             >
               <CardTitle className="text-3xl md:text-4xl font-bold text-foreground">
                 Welcome to <span className="text-gradient">SideQuestHQ</span>
@@ -76,9 +77,9 @@ export default function LoginPage() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
+              transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.5, delay: 0.4 }}
             >
               <CardDescription className="text-foreground-secondary text-base">
                 Your side projects deserve a home, even the dead ones.
@@ -88,9 +89,9 @@ export default function LoginPage() {
 
           <CardContent>
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
+              transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.5, delay: 0.5 }}
             >
               <Button
                 onClick={handleGithubLogin}
@@ -113,9 +114,9 @@ export default function LoginPage() {
             </motion.div>
 
             <motion.p
-              initial={{ opacity: 0 }}
+              initial={shouldReduceMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
+              transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.5, delay: 0.6 }}
               className="mt-6 text-sm text-center text-foreground-tertiary"
             >
               By continuing, you agree to catalog all your side projects,
